@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+
+<canvas id="myCanvas" width="600" height="480" style="border:1px solid #000000;"></canvas> 
+
+</body>
+
+<script type="text/javascript">
+var canvasWidth;
+var canvasHeight;
+var ctx;
+var canvasData;
+
+window.addEventListener('load', function() {
+	initCanvas();
+	let w = new Worker('mandelbrot.js');
+	w.postMessage(['mandelbrot', canvasData, canvasWidth, canvasHeight]);
+	w.onmessage = function(e) {
+		updateCanvas(e.data[0]);
+	}
+});
+
+function initCanvas() {
+	var canvas = document.getElementById("myCanvas");
+	canvasWidth = canvas.width;
+	canvasHeight = canvas.height;
+	ctx = canvas.getContext("2d");
+	canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+}
+
+function updateCanvas(canvasData) {
+    ctx.putImageData(canvasData, 0, 0);
+}
+
+</script>
+
+</html>
