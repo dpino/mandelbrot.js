@@ -35,29 +35,27 @@ function mandelbrot(canvasData, xo, yo, xf, yf) {
                 x = x_new;
                 iter = iter + 1;
             }
-            let color = colors[iter%colors.length];
-            if (iter >= max) {
-                drawPixel(canvasData, col, row, black);
-            } else {
-                drawPixel(canvasData, col, row, color);
-            }
+            let pos = (col + row * xf) * 4;
+            let color = (iter >= max) ? black : colors[iter%colors.length];
+            drawPixel(canvasData, pos, color);
         }
     }
 }
 
-function drawPixel (canvasData, x, y, rgba) {
-    var off = (x + y * canvasWidth) * 4;
-    canvasData.data[off++] = rgba[0];
-    canvasData.data[off++] = rgba[1];
-    canvasData.data[off++] = rgba[2];
-    canvasData.data[off++] = 255;
+function drawPixel (canvasData, pos, rgba) {
+    canvasData.data[pos++] = rgba[0];
+    canvasData.data[pos++] = rgba[1];
+    canvasData.data[pos++] = rgba[2];
+    canvasData.data[pos++] = 255;
 }
 
 onmessage = function(e) {
-    canvasData = e.data[0];
-    canvasWidth = e.data[1];
-    canvasHeight = e.data[2];
+    let canvasData = e.data[0];
+    let xo = e.data[1];
+    let yo = e.data[2];
+    let xf = e.data[3];
+    let yf = e.data[4];
 
-    mandelbrot(canvasData, 0, 0, canvasWidth, canvasHeight);
+    mandelbrot(canvasData, xo, yo, xf, yf);
     postMessage([canvasData]);
 }
