@@ -1,7 +1,3 @@
-let canvasData;
-let canvasWidth;
-let canvasHeight;
-
 let colors = [
    [66, 30, 15],
    [25, 7, 26],
@@ -21,14 +17,14 @@ let colors = [
    [106, 52, 3],
 ];
 
-function mandelbrot() {
-    let w = canvasWidth;
-    let h = canvasHeight;
+function mandelbrot(canvasData, xo, yo, xf, yf) {
+    let w = xf;
+    let h = yf;
     let max = 32;
 
     let black = [0, 0, 0];
-    for (let row=0; row < h-1; row++) {
-        for (let col=0; col < w-1; col++) {
+    for (let row=xo; row < h-1; row++) {
+        for (let col=yo; col < w-1; col++) {
             let c_re = (col - w/2.0)* (4.0/w);
             let c_im = (row - h/2.0)* (4.0/w);
             let x = 0, y = 0;
@@ -41,15 +37,15 @@ function mandelbrot() {
             }
             let color = colors[iter%colors.length];
             if (iter >= max) {
-                drawPixel(col, row, black);
+                drawPixel(canvasData, col, row, black);
             } else {
-                drawPixel(col, row, color);
+                drawPixel(canvasData, col, row, color);
             }
         }
     }
 }
 
-function drawPixel (x, y, rgba) {
+function drawPixel (canvasData, x, y, rgba) {
     var off = (x + y * canvasWidth) * 4;
     canvasData.data[off++] = rgba[0];
     canvasData.data[off++] = rgba[1];
@@ -64,7 +60,7 @@ onmessage = function(e) {
     canvasHeight = e.data[3];
 
     if (msg == 'mandelbrot') {
-        mandelbrot();
+        mandelbrot(canvasData, 0, 0, canvasWidth, canvasHeight);
         postMessage([canvasData]);
     } 
 }
