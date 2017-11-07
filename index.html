@@ -35,28 +35,31 @@ window.addEventListener('load', function() {
   let length = canvas.width * canvas.height * Uint32Array.BYTES_PER_ELEMENT;
   let ia = new Uint8Array(new SharedArrayBuffer(length));
 
-  // Create one worker.
+  // Create several workers.
   let workers = [
     new Worker('mandelbrot.js'),
     new Worker('mandelbrot.js'),
+    new Worker('mandelbrot.js'),
+    new Worker('mandelbrot.js'),
   ];
-  workers[0].onmessage = function(e) {
-    copyImage(canvas, e.data[0], e.data[1], e.data[2]);
-    updateCanvas();
-  }
-  workers[1].onmessage = function(e) {
-    copyImage(canvas, e.data[0], e.data[1], e.data[2]);
-    updateCanvas();
-  }
 
   // Update image content when workers have finished.
   let updateCanvas = onReach(workers.length, function() {
     canvas.ctx.putImageData(canvas.img, 0, 0);
   });
 
+  // Init onmessage function.
+  for (let i = 0; i < workers.length; i++) {
+    workers[i].onmessage = function(e) {
+      copyImage(canvas, e.data[0], e.data[1], e.data[2]);
+      updateCanvas();
+    }
+  }
+
   // Start workers.
-  workers[0].postMessage([ia, 0, workers.length, canvas.width, canvas.height]);
-  workers[1].postMessage([ia, 1, workers.length, canvas.width, canvas.height]);
+  for (let i = 0; i < workers.length; i++) {
+    workers[i].postMessage([ia, i, workers.length, canvas.width, canvas.height]);
+  }
 });
 
 function initCanvas() {
