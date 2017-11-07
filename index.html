@@ -11,19 +11,41 @@
 </body>
 
 <script type="text/javascript">
+
+function onReach(max, fn) {
+  let count = 0;
+  return function() {
+    count++;
+    if (count == max) {
+      fn();
+    }
+  }
+}
+
 window.addEventListener('load', function() {
   let canvas = initCanvas();
-  let w = new Worker('mandelbrot.js');
-  w.onmessage = function(e) {
+  let length = canvas.width * canvas.height * Uint32Array.BYTES_PER_ELEMENT;
+  let ia = new Uint8Array(new SharedArrayBuffer(length));
+
+  // Create one worker.
+  let workers = [
+    new Worker('mandelbrot.js'),
+  ];
+  workers[0].onmessage = function(e) {
     let rgba = e.data[0];
     for (i = 0; i < length; i++) {
       canvas.img.data[i] = rgba[i];
     }
-    updateCanvas(canvas);
+    updateCanvas();
   }
-  let length = canvas.width * canvas.height * Uint32Array.BYTES_PER_ELEMENT;
-  let ia = new Uint8Array(new SharedArrayBuffer(length));
-  w.postMessage([ia, 0, 0, canvas.width, canvas.height]);
+
+  // Update image content when workers have finished.
+  let updateCanvas = onReach(workers.length, function() {
+    canvas.ctx.putImageData(canvas.img, 0, 0);
+  });
+
+  // Start workers.
+  workers[0].postMessage([ia, 0, 0, canvas.width, canvas.height]);
 });
 
 function initCanvas() {
@@ -33,9 +55,6 @@ function initCanvas() {
   return {width: canvas.width, height: canvas.height, img: img, ctx: ctx};
 }
 
-function updateCanvas(canvas) {
-    canvas.ctx.putImageData(canvas.img, 0, 0);
-}
 </script>
 
 </html>
