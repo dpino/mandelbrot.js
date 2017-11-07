@@ -59,5 +59,5 @@ onmessage = function(e) {
     let re = (tag+1) * step; 
 
     mandelbrot(ia, rs, re, w, h);
-    postMessage([ia]);
+    postMessage([ia, rs, re]);
 }
