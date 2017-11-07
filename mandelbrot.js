@@ -54,13 +54,10 @@ function drawPixel (canvasData, x, y, rgba) {
 }
 
 onmessage = function(e) {
-    let msg = e.data[0];
-    canvasData = e.data[1];
-    canvasWidth = e.data[2];
-    canvasHeight = e.data[3];
+    canvasData = e.data[0];
+    canvasWidth = e.data[1];
+    canvasHeight = e.data[2];
 
-    if (msg == 'mandelbrot') {
-        mandelbrot(canvasData, 0, 0, canvasWidth, canvasHeight);
-        postMessage([canvasData]);
-    } 
+    mandelbrot(canvasData, 0, 0, canvasWidth, canvasHeight);
+    postMessage([canvasData]);
 }

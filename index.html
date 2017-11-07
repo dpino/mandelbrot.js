@@ -19,7 +19,7 @@ var canvasData;
 window.addEventListener('load', function() {
 	initCanvas();
 	let w = new Worker('mandelbrot.js');
-	w.postMessage(['mandelbrot', canvasData, canvasWidth, canvasHeight]);
+	w.postMessage([canvasData, canvasWidth, canvasHeight]);
 	w.onmessage = function(e) {
 		updateCanvas(e.data[0]);
 	}
