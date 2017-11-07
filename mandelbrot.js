@@ -17,7 +17,7 @@ let colors = [
    [106, 52, 3],
 ];
 
-function mandelbrot(canvasData, xo, yo, xf, yf) {
+function mandelbrot(ia, xo, yo, xf, yf) {
     let w = xf;
     let h = yf;
     let max = 32;
@@ -37,25 +37,24 @@ function mandelbrot(canvasData, xo, yo, xf, yf) {
             }
             let pos = (col + row * xf) * 4;
             let color = (iter >= max) ? black : colors[iter%colors.length];
-            drawPixel(canvasData, pos, color);
+            drawPixel(ia, pos, color);
         }
     }
 }
 
-function drawPixel (canvasData, pos, rgba) {
-    canvasData.data[pos++] = rgba[0];
-    canvasData.data[pos++] = rgba[1];
-    canvasData.data[pos++] = rgba[2];
-    canvasData.data[pos++] = 255;
+function drawPixel (ia, pos, rgba) {
+    ia[pos++] = rgba[0];
+    ia[pos++] = rgba[1];
+    ia[pos++] = rgba[2];
+    ia[pos++] = 255;
 }
 
 onmessage = function(e) {
-    let canvasData = e.data[0];
+    let ia = e.data[0];
     let xo = e.data[1];
     let yo = e.data[2];
     let xf = e.data[3];
     let yf = e.data[4];
-
-    mandelbrot(canvasData, xo, yo, xf, yf);
-    postMessage([canvasData]);
+    mandelbrot(ia, xo, yo, xf, yf);
+    postMessage([ia]);
 }

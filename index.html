@@ -17,20 +17,26 @@ var ctx;
 var canvasData;
 
 window.addEventListener('load', function() {
-	initCanvas();
-	let w = new Worker('mandelbrot.js');
-	w.postMessage([canvasData, 0, 0, canvasWidth, canvasHeight]);
-	w.onmessage = function(e) {
-		updateCanvas(e.data[0]);
-	}
+  initCanvas();
+  let w = new Worker('mandelbrot.js');
+  w.onmessage = function(e) {
+    let rgba = e.data[0];
+    for (i = 0; i < length; i++) {
+      canvasData.data[i] = rgba[i];
+    }
+    updateCanvas(canvasData);
+  }
+  let length = canvasWidth*canvasHeight*Uint32Array.BYTES_PER_ELEMENT;
+  let ia = new Uint8Array(new SharedArrayBuffer(length));
+  w.postMessage([ia, 0, 0, canvasWidth, canvasHeight]);
 });
 
 function initCanvas() {
-	var canvas = document.getElementById("myCanvas");
-	canvasWidth = canvas.width;
-	canvasHeight = canvas.height;
-	ctx = canvas.getContext("2d");
-	canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+  var canvas = document.getElementById("myCanvas");
+  canvasWidth = canvas.width;
+  canvasHeight = canvas.height;
+  ctx = canvas.getContext("2d");
+  canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
 }
 
 function updateCanvas(canvasData) {
