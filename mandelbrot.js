@@ -17,14 +17,12 @@ let colors = [
    [106, 52, 3],
 ];
 
-function mandelbrot(ia, xo, yo, xf, yf) {
-    let w = xf;
-    let h = yf;
+function mandelbrot(ia, rs, re, w, h) {
     let max = 32;
 
     let black = [0, 0, 0];
-    for (let row=xo; row < h-1; row++) {
-        for (let col=yo; col < w-1; col++) {
+    for (let row=rs; row < re; row++) {
+        for (let col=0; col < w-1; col++) {
             let c_re = (col - w/2.0)* (4.0/w);
             let c_im = (row - h/2.0)* (4.0/w);
             let x = 0, y = 0;
@@ -35,7 +33,7 @@ function mandelbrot(ia, xo, yo, xf, yf) {
                 x = x_new;
                 iter = iter + 1;
             }
-            let pos = (col + row * xf) * 4;
+            let pos = (col + row * w) * 4;
             let color = (iter >= max) ? black : colors[iter%colors.length];
             drawPixel(ia, pos, color);
         }
@@ -51,10 +49,15 @@ function drawPixel (ia, pos, rgba) {
 
 onmessage = function(e) {
     let ia = e.data[0];
-    let xo = e.data[1];
-    let yo = e.data[2];
-    let xf = e.data[3];
-    let yf = e.data[4];
-    mandelbrot(ia, xo, yo, xf, yf);
+    let tag = e.data[1];
+    let nworkers = e.data[2];
+    let w = e.data[3];
+    let h = e.data[4];
+
+    let step = h / nworkers;
+    let rs = tag * step; 
+    let re = (tag+1) * step; 
+
+    mandelbrot(ia, rs, re, w, h);
     postMessage([ia]);
 }
