@@ -48,11 +48,7 @@ function drawPixel (ia, pos, rgba) {
 }
 
 onmessage = function(e) {
-    let ia = e.data[0];
-    let tag = e.data[1];
-    let nworkers = e.data[2];
-    let w = e.data[3];
-    let h = e.data[4];
+    let [ia, tag, nworkers, w, h] = e.data;
 
     let step = h / nworkers;
     let rs = tag * step; 
