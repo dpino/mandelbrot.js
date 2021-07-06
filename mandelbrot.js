@@ -21,20 +21,22 @@ function mandelbrot(ia, rs, re, w, h) {
     let max = 32;
 
     let black = [0, 0, 0];
-    for (let row=rs; row < re; row++) {
-        for (let col=0; col < w-1; col++) {
-            let c_re = (col - w/2.0)* (4.0/w);
-            let c_im = (row - h/2.0)* (4.0/w);
+    for (let row = rs; row < re; row++) {
+        for (let col = 0; col < w-1; col++) {
+            let c = {
+               "re": (col - w/2.0) * (4.0/w),
+               "im": (row - h/2.0) * (4.0/w)
+            }
             let x = 0, y = 0;
             let iter = 0;
             while (x*x + y*y <= 4 && iter < max) {
-                let x_new = x*x - y*y + c_re;
-                y = 2*x*y + c_im;
+                let x_new = x*x - y*y + c.re;
+                y = 2*x*y + c.im;
                 x = x_new;
-                iter = iter + 1;
+                iter++;
             }
             let pos = (col + row * w) * 4;
-            let color = (iter >= max) ? black : colors[iter%colors.length];
+            let color = (iter >= max) ? black : colors[iter % colors.length];
             drawPixel(ia, pos, color);
         }
     }
